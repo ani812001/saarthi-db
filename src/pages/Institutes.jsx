@@ -1,10 +1,9 @@
-import Layout from "../Components/layout/Layout";
-
 const Institutes = () => {
   return (
-    <Layout>
-      <h1>Institutes</h1>
-    </Layout>
+    <div className="page">
+      <h1>Institutes Page</h1>
+      <p>List of institutes will appear here</p>
+    </div>
   );
 };
 

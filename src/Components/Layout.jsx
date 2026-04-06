@@ -1,15 +1,11 @@
-import Sidebar from "./sidebar";
-import Navbar from "./Navbar";
+import Navbar from "./layout/Navbar";
 import PropTypes from "prop-types";
 
 const Layout = ({ children }) => {
   return (
-    <div className="app">
-      <Sidebar />
-      <div className="main">
-        <Navbar />
-        {children}
-      </div>
+    <div>
+      <Navbar />
+      <div className="main-content">{children}</div>
     </div>
   );
 };

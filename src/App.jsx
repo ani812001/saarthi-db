@@ -1,20 +1,20 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./Components/Navbar";
 import Search from "./pages/Search";
-import Companies from "./pages/Companies";
-import Institutes from "./pages/Institutes";
-import "./styles/main.css";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
+      <Navbar />
+
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/companies" element={<Companies />} />
-        <Route path="/institutes" element={<Institutes />} />
+        <Route path="/" element={<Search />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 
