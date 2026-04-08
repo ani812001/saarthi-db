@@ -1,60 +1,47 @@
 import { useState } from "react";
-import SearchBar from "../Components/SearchBar";
-import Filters from "../Components/Filters";
-import Card from "../Components/Card";
+import Card from "../components/Card";
 
 const data = [
-  { name: "TCS", location: "Mumbai", domain: "IT", type: "Company" },
-  { name: "Infosys", location: "Bangalore", domain: "IT", type: "Company" },
-  { name: "Wipro", location: "Bangalore", domain: "IT", type: "Company" },
-  { name: "IIT Bombay", location: "Mumbai", domain: "Education", type: "Institute" },
-  { name: "Nirma University", location: "Gujarat", domain: "Education", type: "Institute" }
+  { name: "TCS", location: "Mumbai", domain: "IT" },
+  { name: "Infosys", location: "Bangalore", domain: "IT" },
+  { name: "Wipro", location: "Bangalore", domain: "IT" }
 ];
 
 function Search() {
   const [query, setQuery] = useState("");
 
-  // 🔥 AI logic
-  const parseQuery = (q) => {
-    let city = "";
-    let domain = "";
-
-    if (q.toLowerCase().includes("bangalore")) city = "Bangalore";
-    if (q.toLowerCase().includes("mumbai")) city = "Mumbai";
-
-    if (q.toLowerCase().includes("it")) domain = "IT";
-    if (q.toLowerCase().includes("college")) domain = "Education";
-
-    return { city, domain };
-  };
-
-  const { city, domain } = parseQuery(query);
-
-  const filteredData = data.filter((item) => {
-    return (
-      item.name.toLowerCase().includes(query.toLowerCase()) ||
-      (city === "" || item.location === city) &&
-      (domain === "" || item.domain === domain)
-    );
-  });
+  const filtered = data.filter((item) =>
+    item.name.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
-    <div>
+    <>
       <div className="hero">
-        <h1>AI Smart Search 🔍</h1>
-        <SearchBar setQuery={setQuery} />
+        <h1>
+          Find Companies & <span>Institutes</span>
+        </h1>
+
+        <input
+          className="search-bar"
+          placeholder="Search..."
+          onChange={(e) => setQuery(e.target.value)}
+        />
+
+        <div className="filters">
+          <div className="pill active">All</div>
+          <div className="pill">Companies</div>
+          <div className="pill">Institutes</div>
+        </div>
       </div>
 
       <div className="container">
-        <Filters />
-
         <div className="grid">
-          {filteredData.map((item, i) => (
+          {filtered.map((item, i) => (
             <Card key={i} item={item} />
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
