@@ -1,8 +1,10 @@
 const Institutes = () => {
   return (
     <div className="page">
-      <h1>Institutes Page</h1>
-      <p>List of institutes will appear here</p>
+      <h1>Institutes</h1>
+
+      <div className="card">IIT Bombay</div>
+      <div className="card">NIT Surat</div>
     </div>
   );
 };
