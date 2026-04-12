@@ -1,8 +1,7 @@
-// services/api.js
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080/api";
+const BASE_URL = "http://localhost:5000/api";
 
-export const searchData = (query) => {
-  return axios.get(`${BASE_URL}/search?q=${query}`);
+export const aiSearch = (prompt) => {
+  return axios.post(`${BASE_URL}/ai/search`, { prompt });
 };
