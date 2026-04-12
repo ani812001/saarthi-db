@@ -55,6 +55,11 @@ function App() {
           element={isAuthenticated ? <Reports /> : <Navigate to="/login" />}
         />
 
+        <Route
+          path="/ai-search"
+          element={isAuthenticated ? <AISearch /> : <Navigate to="/login" />}
+        />
+
       </Routes>
     </Router>
   );
