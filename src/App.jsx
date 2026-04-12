@@ -11,25 +11,21 @@ import Login from "./pages/Login";
 import Companies from "./pages/Companies";
 import Institutes from "./pages/Institutes";
 import Reports from "./pages/Report";
-// (optional later)
-// import AISearch from "./pages/AISearch";
+import AISearch from "./pages/AISearch"; // ✅ FIXED
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
     <Router>
-      {/* Navbar only after login */}
       {isAuthenticated && <Navbar />}
 
       <Routes>
-        {/* LOGIN FIRST */}
         <Route
           path="/login"
           element={<Login setAuth={setIsAuthenticated} />}
         />
 
-        {/* PROTECTED ROUTES */}
         <Route
           path="/"
           element={isAuthenticated ? <Search /> : <Navigate to="/login" />}
@@ -59,7 +55,6 @@ function App() {
           path="/ai-search"
           element={isAuthenticated ? <AISearch /> : <Navigate to="/login" />}
         />
-
       </Routes>
     </Router>
   );

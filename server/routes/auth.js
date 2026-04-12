@@ -1,38 +1,60 @@
-// routes/auth.js
 import express from "express";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
 const router = express.Router();
 
-router.post("/signup", async (req, res) => {
-  const { username, password } = req.body;
+//
+// 🔐 REGISTER
+//
+router.post("/register", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
 
-  const hashed = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = await User.create({
-    username,
-    password: hashed,
-  });
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+    });
 
-  res.json(user);
+    await user.save();
+
+    res.json({ message: "User registered successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
+//
+// 🔐 LOGIN
+//
 router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ username });
+    const user = await User.findOne({ email });
 
-  if (!user) return res.status(400).json("User not found");
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
 
-  if (!isMatch) return res.status(400).json("Invalid credentials");
+    if (!isMatch) {
+      return res.status(400).json({ error: "Invalid password" });
+    }
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
-  res.json({ token });
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 export default router;

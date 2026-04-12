@@ -1,10 +1,11 @@
 import express from "express";
 import OpenAI from "openai";
 import Company from "../models/Company.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/search", async (req, res) => {
+router.post("/search", authMiddleware, async (req, res) => {
   try {
     console.log("AI ROUTE KEY:", process.env.OPENAI_API_KEY);
 

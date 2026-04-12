@@ -7,6 +7,9 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.js";
 import aiRoutes from "./routes/ai.js";
+import statsRoutes from "./routes/stats.js";
+import domainStatsRoutes from "./routes/domainStats.js";
+import uploadRoutes from "./routes/upload.js";
 
 // DEBUG
 console.log("OPENAI KEY:", process.env.OPENAI_API_KEY);
@@ -14,6 +17,11 @@ console.log("OPENAI KEY:", process.env.OPENAI_API_KEY);
 connectDB();
 
 const app = express();
+
+app.use("/api/upload", uploadRoutes);
+
+app.use("/api/stats", statsRoutes);
+app.use("/api/domain-stats", domainStatsRoutes);
 
 app.use(express.json());
 app.use(cors());
