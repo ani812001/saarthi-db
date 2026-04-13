@@ -16,5 +16,12 @@ Note: This will impact Vite dev & build performances.
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-<img width="1857" height="889" alt="image" src="https://github.com/user-attachments/assets/df31d718-fd97-4d6d-ab74-929e04279248" />
-<img width="1833" height="700" alt="image" src="https://github.com/user-attachments/assets/f6e521a6-9417-4c8f-94dc-17784feff719" />
+
+<img width="934" height="592" alt="image" src="https://github.com/user-attachments/assets/4f4fbac6-1be7-4765-964b-4950a56df8b3" />
+
+<img width="1913" height="892" alt="image" src="https://github.com/user-attachments/assets/7f4f1c26-039e-4cd1-be2f-ed051f0990d6" />
+
+<img width="1913" height="721" alt="image" src="https://github.com/user-attachments/assets/49ba7e4f-6d8e-464b-95dd-cf4c82240ea2" />
+
+
+
