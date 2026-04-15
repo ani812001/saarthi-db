@@ -1,18 +1,16 @@
 import express from "express";
 import OpenAI from "openai";
 import Company from "../models/Company.js";
-import authMiddleware from "../middleware/authMiddleware.js";
+import axios from "axios";
 
 const router = express.Router();
 
-router.post("/search", authMiddleware, async (req, res) => {
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+router.post("/search", async (req, res) => {
   try {
-    console.log("AI ROUTE KEY:", process.env.OPENAI_API_KEY);
-
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
     const { prompt } = req.body;
 
     const aiResponse = await openai.chat.completions.create({
@@ -20,7 +18,8 @@ router.post("/search", authMiddleware, async (req, res) => {
       messages: [
         {
           role: "system",
-          content: "Convert user query into JSON filter: city, domain",
+          content:
+            "Return ONLY JSON with fields: name, location, domain. No explanation.",
         },
         {
           role: "user",
@@ -29,14 +28,47 @@ router.post("/search", authMiddleware, async (req, res) => {
       ],
     });
 
-    const filter = JSON.parse(aiResponse.choices[0].message.content);
+    let filter = {};
 
-    const results = await Company.find(filter);
+    try {
+      filter = JSON.parse(aiResponse.choices[0].message.content);
+    } catch (e) {
+      return res.status(400).json({ error: "AI parsing failed" });
+    }
+
+    let results = await Company.find(filter);
+
+    // 🔥 If not found → Google API
+    if (results.length === 0) {
+      const googleRes = await axios.get(
+        "https://maps.googleapis.com/maps/api/place/textsearch/json",
+        {
+          params: {
+            query: prompt,
+            key: process.env.GOOGLE_API_KEY,
+          },
+        },
+      );
+
+      results = googleRes.data.results.map((place) => ({
+        name: place.name,
+        location: place.formatted_address,
+        domain: "Unknown",
+      }));
+
+      // 🔥 Save to DB (Data Enrichment)
+      for (let item of results) {
+        const exists = await Company.findOne({ name: item.name });
+
+        if (!exists) {
+          await Company.create(item);
+        }
+      }
+    }
 
     res.json(results);
-  } catch (error) {
-    console.error("AI ERROR:", error.message);
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

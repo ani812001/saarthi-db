@@ -6,7 +6,7 @@ const companySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    city: String,
+    location: String, // ✅ FIXED (was city)
     domain: String,
     size: String,
   },

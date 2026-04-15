@@ -1,25 +1,20 @@
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-function Login({ setAuth }) {
-  const navigate = useNavigate(); // ✅ MUST be inside component
+const [email, setEmail] = useState("");
+const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    setAuth(true);     // login state
-    navigate("/");     // redirect to Search page
-  };
+<>
+  <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+  <input type="password" onChange={(e) => setPassword(e.target.value)} />
+</>
 
-  return (
-    <div className="login-container">
-      <div className="login-card">
-        <h2>SaarthiDB</h2>
+const handleLogin = async () => {
+  const res = await axios.post("http://localhost:5000/api/auth/login", {
+    email,
+    password,
+  });
 
-        <input placeholder="Username" />
-        <input type="password" placeholder="Password" />
-
-        <button onClick={handleLogin}>Sign in</button>
-      </div>
-    </div>
-  );
-}
-
-export default Login;
+  localStorage.setItem("token", res.data.token);
+  setAuth(true);
+  navigate("/");
+};

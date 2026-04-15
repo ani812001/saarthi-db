@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { useState } from "react";
 
 // Components
-import Navbar from "./components/Navbar";
+import Navbar from "./Components/Navbar";
 
 // Pages
 import Search from "./pages/Search";
@@ -12,6 +12,7 @@ import Companies from "./pages/Companies";
 import Institutes from "./pages/Institutes";
 import Reports from "./pages/Report";
 import AISearch from "./pages/AISearch"; // ✅ FIXED
+import Signup from "./pages/Signup";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -25,6 +26,8 @@ function App() {
           path="/login"
           element={<Login setAuth={setIsAuthenticated} />}
         />
+
+        <Route path="/signup" element={<Signup />} />
 
         <Route
           path="/"
