@@ -5,8 +5,10 @@ import fs from "fs";
 import Company from "../models/Company.js";
 
 const router = express.Router();
-
 const upload = multer({ dest: "uploads/" });
+
+// 🔥 Clean function
+const cleanText = (text) => text?.trim().toLowerCase();
 
 router.post("/", upload.single("file"), async (req, res) => {
   const results = [];
@@ -15,33 +17,41 @@ router.post("/", upload.single("file"), async (req, res) => {
     fs.createReadStream(req.file.path)
       .pipe(csv())
       .on("data", (data) => {
-        // 🔥 Clean keys
-        const cleanedData = {};
+        const item = {
+          name: cleanText(data.name),
+          location: cleanText(data.location),
+          domain: cleanText(data.domain || data[" domain"]),
+        };
 
-        Object.keys(data).forEach((key) => {
-          cleanedData[key.trim()] = data[key];
-        });
+        if (!item.name || !item.location) return;
 
-        console.log("CLEANED ROW:", cleanedData);
-
-        results.push({
-          name: cleanedData.name,
-          location: cleanedData.location,
-          domain: cleanedData.domain,
-        });
+        results.push(item);
       })
       .on("end", async () => {
-        await Company.insertMany(results);
+        let inserted = 0;
+
+        for (let item of results) {
+          const exists = await Company.findOne({
+            name: new RegExp(`^${item.name}$`, "i"),
+            location: new RegExp(`^${item.location}$`, "i"),
+          });
+
+          if (!exists) {
+            await Company.create(item);
+            inserted++;
+          }
+        }
 
         fs.unlinkSync(req.file.path);
 
         res.json({
-          message: "CSV uploaded successfully",
-          count: results.length,
+          message: "CSV processed",
+          total: results.length,
+          inserted,
         });
       });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
