@@ -5,21 +5,33 @@ import axios from "axios";
 
 const router = express.Router();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 router.post("/search", async (req, res) => {
   try {
+    // ✅ Check API key first (prevents crash)
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({
+        error: "OPENAI_API_KEY missing in .env",
+      });
+    }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
     const { prompt } = req.body;
 
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt is required" });
+    }
+
+    // 🤖 AI CALL
     const aiResponse = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
           content:
-            "Return ONLY JSON with fields: name, location, domain. No explanation.",
+            "Return ONLY JSON like { name, location, domain }. No explanation.",
         },
         {
           role: "user",
@@ -30,15 +42,20 @@ router.post("/search", async (req, res) => {
 
     let filter = {};
 
+    // ✅ Safe JSON parsing
     try {
       filter = JSON.parse(aiResponse.choices[0].message.content);
     } catch (e) {
-      return res.status(400).json({ error: "AI parsing failed" });
+      return res.status(400).json({
+        error: "AI response parsing failed",
+        raw: aiResponse.choices[0].message.content,
+      });
     }
 
+    // 🔍 DB SEARCH
     let results = await Company.find(filter);
 
-    // 🔥 If not found → Google API
+    // 🌐 FALLBACK → Google Places API
     if (results.length === 0) {
       const googleRes = await axios.get(
         "https://maps.googleapis.com/maps/api/place/textsearch/json",
@@ -56,9 +73,11 @@ router.post("/search", async (req, res) => {
         domain: "Unknown",
       }));
 
-      // 🔥 Save to DB (Data Enrichment)
+      // 💾 SAVE TO DB (avoid duplicates)
       for (let item of results) {
-        const exists = await Company.findOne({ name: item.name });
+        const exists = await Company.findOne({
+          name: new RegExp(`^${item.name}$`, "i"),
+        });
 
         if (!exists) {
           await Company.create(item);
@@ -68,6 +87,7 @@ router.post("/search", async (req, res) => {
 
     res.json(results);
   } catch (err) {
+    console.error("AI SEARCH ERROR:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
